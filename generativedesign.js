@@ -4,6 +4,8 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+drawLinesToPoint();
+
 function getRandomColor() {
   const r = Math.floor(Math.random() * 256);
   const g = Math.floor(0);
@@ -84,6 +86,10 @@ function drawLinesToPoint(xCenter, yCenter) {
   drawRandomCircles(100);
   drawWarningText();
 }
+
+const xCenter = canvas.width / 2;
+const yCenter = canvas.height / 2;
+drawLinesToPoint(xCenter, yCenter);
 
 canvas.addEventListener("mousemove", (event) => {
   const xCenter = event.clientX;
