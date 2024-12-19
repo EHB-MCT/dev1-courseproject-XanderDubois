@@ -9,23 +9,26 @@ let currentColors = {
   lines: [],
 };
 
+// flag to toggle the color mode
+let isColorChanged = false;
+
 let circles = []; // array to store falling circles
 
-// function to generate random colors
+// generate random colors
 function getRandomColor() {
-  const r = Math.floor(Math.random() * 256);
-  const g = Math.floor(0);
+  const r = Math.floor(Math.random() * 128);
+  const g = 0;
   const b = Math.floor(Math.random() * 128 + 128);
   return `rgb(${r},${g},${b})`;
 }
 
-// move mouse text
+// move mouse & click text
 function drawMoveText() {
   ctx.font = "40px Arial";
   ctx.fillStyle = "white";
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  ctx.fillText("Move your mouse!", 10, 10, 400);
+  ctx.fillText("Move your mouse and try clicking!", 10, 10, 400);
 }
 
 // draw lines towards a point
@@ -37,11 +40,13 @@ function drawLinesToPoint(xCenter, yCenter) {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // only change line colors after 25 frames of moving your mouse
+  // only change line colors after 25 frames of moving the mouse
   if (mouseFrameCount >= 25) {
     currentColors.lines = [];
     for (let i = 0; i < topBottomLineCount + 1; i++) {
-      currentColors.lines.push(getRandomColor());
+      currentColors.lines.push(
+        isColorChanged ? getRandomColor() : getInitialColor()
+      );
     }
     mouseFrameCount = 0;
   }
@@ -86,7 +91,7 @@ function drawLinesToPoint(xCenter, yCenter) {
   // draw the falling circles
   drawFallingCircles();
 
-  // draw the move text
+  // draw the move & click text
   drawMoveText();
 }
 
@@ -111,15 +116,13 @@ function drawFallingCircles() {
   }
 }
 
-// circle stuff
+// circle drawing
 function spawnCircle() {
   const size = Math.random() * 35 + 15;
   const color =
     currentColors.lines[Math.floor(Math.random() * currentColors.lines.length)];
-  // random speed
   const speedX = Math.random() * 2 + 1;
   const speedY = Math.random() * 2 + 1;
-  // random place at the top
   const x = Math.random() * canvas.width;
   const y = 0;
 
@@ -135,9 +138,23 @@ function spawnCircle() {
 
 setInterval(spawnCircle, 50);
 
+// toggle color scheme on click
+canvas.addEventListener("click", () => {
+  isColorChanged = !isColorChanged; // change the color mode
+});
+
+// mouse move event to update frames and drawing
 canvas.addEventListener("mousemove", (event) => {
   mouseFrameCount++;
   const xCenter = event.clientX;
   const yCenter = event.clientY;
   drawLinesToPoint(xCenter, yCenter);
 });
+
+// color stuff
+function getInitialColor() {
+  const r = Math.floor(Math.random() * 128 + 128);
+  const g = Math.floor(Math.random() * 128);
+  const b = 0;
+  return `rgb(${r},${g},${b})`;
+}
