@@ -151,7 +151,7 @@ canvas.addEventListener("mousemove", (event) => {
   drawLinesToPoint(xCenter, yCenter);
 });
 
-// color stuff
+// color changing stuff
 function getInitialColor() {
   const r = Math.floor(Math.random() * 128 + 128);
   const g = Math.floor(Math.random() * 128);
