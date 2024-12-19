@@ -4,7 +4,10 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-drawLinesToPoint();
+let mouseFrameCount = 0;
+let currentColors = {
+  lines: [],
+};
 
 function getRandomColor() {
   const r = Math.floor(Math.random() * 256);
@@ -13,27 +16,13 @@ function getRandomColor() {
   return `rgb(${r},${g},${b})`;
 }
 
-// warning text lmao
-function drawWarningText() {
+// move mouse text
+function drawMoveText() {
   ctx.font = "40px Arial";
   ctx.fillStyle = "white";
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  ctx.fillText("WARNING: Flashing Lights", 10, 10, 400);
-}
-
-// random color circles
-function drawRandomCircles(count) {
-  for (let i = 0; i < count; i++) {
-    const x = Math.random() * canvas.width;
-    const y = Math.random() * canvas.height;
-    const radius = Math.random() * 10 + 20;
-
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = getRandomColor();
-    ctx.fill();
-  }
+  ctx.fillText("Move your mouse!", 10, 10, 400);
 }
 
 // lines to a point
@@ -45,6 +34,15 @@ function drawLinesToPoint(xCenter, yCenter) {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // only change lines colors after 25 frames of moving your mouse
+  if (mouseFrameCount >= 25) {
+    currentColors.lines = [];
+    for (let i = 0; i < topBottomLineCount + 1; i++) {
+      currentColors.lines.push(getRandomColor());
+    }
+    mouseFrameCount = 0;
+  }
+
   // lines top and bottom
   for (let i = 0; i < topBottomLineCount + 1; i++) {
     const x = (canvas.width / topBottomLineCount) * i;
@@ -53,7 +51,7 @@ function drawLinesToPoint(xCenter, yCenter) {
     ctx.beginPath();
     ctx.moveTo(x, 0);
     ctx.lineTo(xCenter, yCenter);
-    ctx.strokeStyle = getRandomColor();
+    ctx.strokeStyle = currentColors.lines[i];
     ctx.lineWidth = 2;
     ctx.stroke();
 
@@ -72,7 +70,7 @@ function drawLinesToPoint(xCenter, yCenter) {
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(xCenter, yCenter);
-    ctx.strokeStyle = getRandomColor();
+    ctx.strokeStyle = currentColors.lines[i];
     ctx.stroke();
 
     // right edge
@@ -82,16 +80,15 @@ function drawLinesToPoint(xCenter, yCenter) {
     ctx.stroke();
   }
 
-  // draw everything in the right order
-  drawRandomCircles(100);
-  drawWarningText();
+  // draw the text
+  drawMoveText();
 }
 
 const xCenter = canvas.width / 2;
 const yCenter = canvas.height / 2;
-drawLinesToPoint(xCenter, yCenter);
 
 canvas.addEventListener("mousemove", (event) => {
+  mouseFrameCount++;
   const xCenter = event.clientX;
   const yCenter = event.clientY;
   drawLinesToPoint(xCenter, yCenter);
