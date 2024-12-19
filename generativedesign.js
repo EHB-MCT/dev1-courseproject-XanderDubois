@@ -9,6 +9,9 @@ let currentColors = {
   lines: [],
 };
 
+let circles = []; // array to store falling circles
+
+// function to generate random colors
 function getRandomColor() {
   const r = Math.floor(Math.random() * 256);
   const g = Math.floor(0);
@@ -25,16 +28,16 @@ function drawMoveText() {
   ctx.fillText("Move your mouse!", 10, 10, 400);
 }
 
-// lines to a point
+// draw lines towards a point
 function drawLinesToPoint(xCenter, yCenter) {
   const topBottomLineCount = 25;
   const leftRightLineCount = 16;
 
-  // background color black
+  // set background to black
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // only change lines colors after 25 frames of moving your mouse
+  // only change line colors after 25 frames of moving your mouse
   if (mouseFrameCount >= 25) {
     currentColors.lines = [];
     for (let i = 0; i < topBottomLineCount + 1; i++) {
@@ -43,7 +46,7 @@ function drawLinesToPoint(xCenter, yCenter) {
     mouseFrameCount = 0;
   }
 
-  // lines top and bottom
+  // top and bottom lines
   for (let i = 0; i < topBottomLineCount + 1; i++) {
     const x = (canvas.width / topBottomLineCount) * i;
 
@@ -62,7 +65,7 @@ function drawLinesToPoint(xCenter, yCenter) {
     ctx.stroke();
   }
 
-  // lines left and right
+  // left and right lines
   for (let i = 0; i < leftRightLineCount + 1; i++) {
     const y = (canvas.height / leftRightLineCount) * i;
 
@@ -80,12 +83,57 @@ function drawLinesToPoint(xCenter, yCenter) {
     ctx.stroke();
   }
 
-  // draw the text
+  // draw the falling circles
+  drawFallingCircles();
+
+  // draw the move text
   drawMoveText();
 }
 
-const xCenter = canvas.width / 2;
-const yCenter = canvas.height / 2;
+// circle stuff
+function drawFallingCircles() {
+  for (let i = 0; i < circles.length; i++) {
+    const circle = circles[i];
+
+    circle.x -= circle.speedX;
+    circle.y += circle.speedY;
+
+    // if the circle moves off the screen, remove it
+    if (circle.y > canvas.height || circle.x < 0) {
+      circles.splice(i, 1);
+      i--;
+    } else {
+      ctx.beginPath();
+      ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+      ctx.fillStyle = circle.color;
+      ctx.fill();
+    }
+  }
+}
+
+// circle stuff
+function spawnCircle() {
+  const size = Math.random() * 35 + 15;
+  const color =
+    currentColors.lines[Math.floor(Math.random() * currentColors.lines.length)];
+  // random speed
+  const speedX = Math.random() * 2 + 1;
+  const speedY = Math.random() * 2 + 1;
+  // random place at the top
+  const x = Math.random() * canvas.width;
+  const y = 0;
+
+  circles.push({
+    x: x,
+    y: y,
+    radius: size,
+    color: color,
+    speedX: speedX,
+    speedY: speedY,
+  });
+}
+
+setInterval(spawnCircle, 50);
 
 canvas.addEventListener("mousemove", (event) => {
   mouseFrameCount++;
